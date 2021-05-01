@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using Photon.Voice.Unity;
 
 public class PlayerManager : MonoBehaviourPun
 {
@@ -13,15 +14,18 @@ public class PlayerManager : MonoBehaviourPun
     public float jumpHeight = 3f;
     public float mouseSensitivity = 100f;
 
-    public Transform cameraTransform;
+    public Camera firstPersonCamera;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
+    public Recorder photonRecorder;
+
     private float xRotation = 0f;
     private Vector3 velocity;
     private bool isGrounded;
+    private bool inMenu = false;
 
     private void Awake()
     {
@@ -34,20 +38,64 @@ public class PlayerManager : MonoBehaviourPun
         }
 
         DontDestroyOnLoad(this.gameObject);
+
+        
+        firstPersonCamera.enabled = IsMine();
+    }
+
+    private void Start()
+    {
+        //photonRecorder.TransmitEnabled = IsMine();
     }
 
     private void Update()
     {
         if (IsMine())
         {
-            UpdateCamera();
-            UpdateMovement();
+            UpdateMenu();
+
+            if (!inMenu)
+            {
+                UpdateCamera();
+                UpdateMovement();
+
+                if (Input.GetKeyDown(KeyCode.LeftShift))
+                {
+                    photonRecorder.TransmitEnabled = true;
+                }
+
+                if (Input.GetKeyUp(KeyCode.LeftShift))
+                {
+                    photonRecorder.TransmitEnabled = false;
+                }
+            }
         }
     }
 
     private bool IsMine()
     {
         return photonView.IsMine || !PhotonNetwork.IsConnected;
+    }
+
+    private void UpdateMenu()
+    {
+        if (inMenu)
+        {
+            if (Input.GetButtonDown("Cancel"))
+            {
+                inMenu = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+
+        }
+        else
+        {
+            if (Input.GetButtonDown("Cancel"))
+            {
+                inMenu = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
     }
 
     private void UpdateCamera()
@@ -58,7 +106,7 @@ public class PlayerManager : MonoBehaviourPun
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        firstPersonCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
         transform.Rotate(Vector3.up * mouseX);
     }
