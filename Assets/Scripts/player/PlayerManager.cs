@@ -7,6 +7,7 @@ public class PlayerManager : MonoBehaviourPun
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject LocalPlayerInstance;
 
+    public Animator animator;
     public CharacterController controller;
 
     public float speed = 12f;
@@ -23,7 +24,8 @@ public class PlayerManager : MonoBehaviourPun
     public Recorder photonRecorder;
 
     private float xRotation = 0f;
-    private Vector3 velocity;
+    public Vector3 velocity;
+    public double magnitude;
     private bool isGrounded;
     private bool inMenu = false;
 
@@ -134,5 +136,19 @@ public class PlayerManager : MonoBehaviourPun
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        magnitude = move.magnitude;
+        if (move.magnitude > 0.1f)
+        {
+            animator.Play("walk");
+        } else
+        {
+            animator.Play("idle");
+        }
+
+        if (Input.GetKeyDown("e"))
+        {
+            animator.Play("grab");
+        }
     }
 }
