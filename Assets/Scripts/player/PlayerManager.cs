@@ -138,7 +138,7 @@ public class PlayerManager : MonoBehaviourPun
         controller.Move(velocity * Time.deltaTime);
 
         magnitude = move.magnitude;
-        if (move.magnitude > 0.1f)
+        if (move.magnitude > 0.1f )
         {
             animator.Play("walk");
         } else
@@ -150,5 +150,15 @@ public class PlayerManager : MonoBehaviourPun
         {
             animator.Play("grab");
         }
+    }
+
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
+    }
+
+    public void CloseMenu()
+    {
+        inMenu = false;
     }
 }
