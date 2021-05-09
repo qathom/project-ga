@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Realtime;
-using Photon.Pun;
 
 public class RoomInfoPanel : MonoBehaviour
 {
@@ -12,9 +9,11 @@ public class RoomInfoPanel : MonoBehaviour
     public Button joinButton;
 
     private RoomInfo room;
+    private Launcher launcher;
 
-    public void UpdateRoomInfo(RoomInfo roomInfo)
+    public void UpdateRoomInfo(RoomInfo roomInfo, Launcher launcher)
     {
+        this.launcher = launcher;
         this.room = roomInfo;
 
         roomNameText.text = roomInfo.Name;
@@ -24,6 +23,6 @@ public class RoomInfoPanel : MonoBehaviour
 
     public void JoinRoom()
     {
-        PhotonNetwork.JoinRoom(room.Name);
+        launcher.JoinRoom(room);
     }
 }
