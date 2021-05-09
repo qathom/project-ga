@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - PickableObject
+  - Medieval
+  - Present
+  - Future
   layers:
   - Default
   - TransparentFX
