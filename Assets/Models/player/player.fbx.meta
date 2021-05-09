@@ -12,7 +12,12 @@ ModelImporter:
   - first:
       74: -7408968806781539716
     second: metarig|walk
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: CharacterTexture
+    second: {fileID: 2100000, guid: 2f33109d63d1c46aba0a23bbac5f3475, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
