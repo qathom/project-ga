@@ -140,15 +140,15 @@ public class PlayerManager : MonoBehaviourPun
         magnitude = move.magnitude;
         if (move.magnitude > 0.1f)
         {
-            animator.Play("walk");
+            //animator.Play("walk");
         } else
         {
-            animator.Play("idle");
+            //animator.Play("idle");
         }
 
         if (Input.GetKeyDown("e"))
         {
-            animator.Play("grab");
+            //animator.Play("grab");
         }
     }
 }
