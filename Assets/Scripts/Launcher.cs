@@ -146,12 +146,10 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         Debug.Log("Joined room");
 
-        // Critical: We only load if we are the first player, else we rely on  PhotonNetwork.automaticallySyncScene to sync our instance scene.
+        // Critical: We only load if we are the first player, else we rely on PhotonNetwork.automaticallySyncScene to sync our instance scene.
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
-            Debug.Log("Load Room 1");
-
-            PhotonNetwork.LoadLevel("Room 1");
+            PhotonNetwork.LoadLevel(1);
         }
     }
 
