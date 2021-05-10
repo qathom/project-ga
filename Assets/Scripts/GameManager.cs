@@ -13,10 +13,6 @@ public static class RoomEnv
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
-    public enum Events
-    {
-        JOIN_PAST, JOIN_PRESENT, JOIN_FUTURE
-    }
 
     [Tooltip("The prefab to use for representing the player")]
     public GameObject playerPrefab;

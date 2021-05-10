@@ -64,7 +64,24 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
     private void Start()
     {
-        
+        ignoreCollisions();
+    }
+
+    private void ignoreCollisions()
+    {
+        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("Player");
+
+        Collider collider = GetComponent<Collider>();
+
+        foreach (GameObject otherGameObject in gameObjects)
+        {
+
+            if (otherGameObject != this.gameObject)
+            {
+                Collider otherCollider = otherGameObject.GetComponent<Collider>();
+                Physics.IgnoreCollision(collider, otherCollider);
+            }
+        }
     }
 
     private void Update()

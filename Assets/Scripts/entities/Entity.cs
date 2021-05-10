@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Photon.Pun;
 
 public class Entity : MonoBehaviour
 {
@@ -7,6 +8,16 @@ public class Entity : MonoBehaviour
     private bool highlighted = false;
 
     private Outline outline;
+
+    protected PhotonView photonView;
+    public bool IsPun
+    {
+        get { return photonView != null; }
+    }
+    public bool IsMine
+    {
+        get { return IsPun && photonView.IsMine;  }
+    }
 
     public bool Highlighted
     {
@@ -25,26 +36,27 @@ public class Entity : MonoBehaviour
         }
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
+        photonView = GetComponent<PhotonView>();
+
         // Setup outline
         outline = GetComponent<Outline>();
         Debug.Log(outline);
         Highlighted = highlighted;
     }
 
-    private void Start()
+    protected virtual void Start()
     {
 
     }
 
-    private void Update()
+    protected virtual void Update()
     {
 
     }
 
     public virtual void Interact(PlayerManager playerManager)
     {
-        Debug.Log("INTERACT?");
     }
 }
