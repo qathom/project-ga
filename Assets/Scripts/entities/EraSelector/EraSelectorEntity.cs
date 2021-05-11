@@ -5,45 +5,46 @@ using Photon.Realtime;
 
 public class EraSelectorEntity : Entity
 {
-    public PlayerEra playerEra = PlayerEra.PAST;
+    public int era = PlayerEra2.PAST;
+
     private bool _used;
     public bool Used
     {
         get { return _used; }
     }
 
-    private PlayerManager localPlayerManager;
-    private bool requesting;
-
     protected override void Awake()
     {
         base.Awake();
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        _used = GameLobbyBrain.Instance.PlayerForEra(era) >= 0;
     }
 
     public override void Interact(PlayerManager playerManager)
     {
         base.Interact(playerManager);
 
-        if (!Used && playerManager.era == null)
-        {
-            Debug.Log("ON");
-            playerManager.era = playerEra;
-            _used = true;
-            photonView.RPC("SetUsed", RpcTarget.Others, true);
-        }
-        else  if (Used && playerManager.era == playerEra)
-        {
-            Debug.Log("OFF");
-            playerManager.era = null;
-            _used = false;
-            photonView.RPC("SetUsed", RpcTarget.Others, false);
-        }
-    }
+        int currentPlayer = GameLobbyBrain.Instance.PlayerForEra(era);
 
-    [PunRPC]
-    void SetUsed(bool used)
-    {
-        _used = used;
-        Debug.LogFormat("set used {0}", used);
+        int player = PhotonNetwork.LocalPlayer.ActorNumber;
+        int playerEra = GameLobbyBrain.Instance.EraForPlayer(player);
+
+        if (currentPlayer < 0 && playerEra < 0)
+        {
+                GameLobbyBrain.Instance.photonView.RPC(
+                    "PlayerJoinOrLeaveEra", RpcTarget.MasterClient,
+                    era, player, true);
+        }
+        else if (currentPlayer == player)
+        {
+                GameLobbyBrain.Instance.photonView.RPC(
+                    "PlayerJoinOrLeaveEra", RpcTarget.MasterClient,
+                    era, player, false);
+        }
     }
 }

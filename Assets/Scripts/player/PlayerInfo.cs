@@ -8,9 +8,9 @@ public class PlayerInfo : MonoBehaviour
     [SerializeField]
     private Text nameText;
 
-    public void UpdateInfo(string name, PlayerEra? era)
+    public void UpdateInfo(string name, int era)
     {
-        nameText.text = name + (era != null ? " [" + era.ToString() + "]" : "");
+        nameText.text = name + (era >= 0 ? " [" + era.ToString() + "]" : "");
     }
 
     private void Update()

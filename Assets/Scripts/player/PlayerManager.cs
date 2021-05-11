@@ -4,11 +4,10 @@ using Photon.Voice.Unity;
 
 public class PlayerManager : MonoBehaviourPun, IPunObservable
 {
-    [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
-    public static GameObject LocalPlayerInstance;
+    public static PlayerManager LocalInstance;
 
     [HideInInspector]
-    public PlayerEra? era;
+    public int era = -1;
 
     [HideInInspector]
     public string playerName;
@@ -35,10 +34,12 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     public Recorder photonRecorder;
 
     private float xRotation = 0f;
-    public Vector3 velocity;
-    public double magnitude;
+    private Vector3 velocity;
     private bool isGrounded;
     private bool inMenu = false;
+
+    private bool InLobby { get { return GameLobbyBrain.Instance != null; } }
+    private bool InEscapeRoom { get { return GameManager.Instance != null; } }
 
     private void Awake()
     {
@@ -54,9 +55,10 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         // Tag local player instance to not destroy when loadong various scenes.
         if (mine)
         {
-            PlayerManager.LocalPlayerInstance = this.gameObject;
+            PlayerManager.LocalInstance = this;
             Cursor.lockState = CursorLockMode.Locked;
             playerName = PhotonNetwork.NickName;
+            playerInfo.enabled = false;
         }
 
         DontDestroyOnLoad(this.gameObject);
@@ -99,6 +101,8 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
                 if (selectedEntity != null && Input.GetKeyDown(KeyCode.E))
                 {
+                    Debug.Log("GRAB");
+                    animator.SetTrigger("Grab");
                     selectedEntity.Interact(this);
                 }
 
@@ -111,6 +115,11 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
                 {
                     photonRecorder.TransmitEnabled = false;
                 }
+            }
+
+            if (InLobby)
+            {
+                era = GameLobbyBrain.Instance.EraForPlayer(PhotonNetwork.LocalPlayer.ActorNumber);
             }
         }
 
@@ -159,7 +168,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
         if (isGrounded && velocity.y < 0f)
         {
-            velocity.y = -2f;
+            velocity.y = -0.5f;
         }
 
         float x = Input.GetAxis("Horizontal");
@@ -177,15 +186,11 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
-        magnitude = move.magnitude;
-        if (move.magnitude > 0.1f)
-        {
-            animator.Play("walk");
-        }
-        else
-        {
-            animator.Play("idle");
-        }
+        Debug.LogFormat("Animator parameters: {0} {1} {2}", isGrounded, move.sqrMagnitude > 0f, velocity.magnitude);
+
+        animator.SetBool("OnGround", isGrounded);
+        animator.SetBool("IsWalking", move.sqrMagnitude > 0f);
+        animator.SetFloat("VerticalSpeed", velocity.magnitude);
     }
 
     private Entity selectedEntity;
@@ -252,8 +257,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         {
             this.playerName = (string)stream.ReceiveNext();
 
-            object era = stream.ReceiveNext();
-            this.era = era != null ? (PlayerEra?)era : null;
+            this.era = (int)stream.ReceiveNext();
         }
     }
 }
