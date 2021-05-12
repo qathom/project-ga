@@ -98,12 +98,18 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
                 UpdateMovement();
                 UpdateCursor();
                 //UpdateOverlay();
+                if (selectedEntity != null)
+                {
+                    Debug.Log(selectedEntity.GetDescription());
+                }
 
                 if (selectedEntity != null && Input.GetKeyDown(KeyCode.E))
                 {
-                    Debug.Log("GRAB");
-                    animator.SetTrigger("Grab");
-                    selectedEntity.Interact(this);
+                    if (selectedEntity.CanInteract())
+                    {
+                        animator.SetTrigger("Grab");
+                        selectedEntity.Interact(this);
+                    }
                 }
 
                 if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -185,8 +191,6 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-
-        Debug.LogFormat("Animator parameters: {0} {1} {2}", isGrounded, move.sqrMagnitude > 0f, velocity.magnitude);
 
         animator.SetBool("OnGround", isGrounded);
         animator.SetBool("IsWalking", move.sqrMagnitude > 0f);

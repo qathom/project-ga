@@ -59,4 +59,14 @@ public class Entity : MonoBehaviour
     public virtual void Interact(PlayerManager playerManager)
     {
     }
+
+    public virtual bool CanInteract()
+    {
+        return true;
+    }
+
+    public virtual string GetDescription()
+    {
+        return "";
+    }
 }

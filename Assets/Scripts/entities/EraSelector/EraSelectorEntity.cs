@@ -7,22 +7,14 @@ public class EraSelectorEntity : Entity
 {
     public int era = PlayerEra2.PAST;
 
-    private bool _used;
     public bool Used
     {
-        get { return _used; }
+        get { return GameLobbyBrain.Instance.PlayerForEra(era) >= 0; }
     }
 
-    protected override void Awake()
+    private bool Mine
     {
-        base.Awake();
-    }
-
-    protected override void Update()
-    {
-        base.Update();
-
-        _used = GameLobbyBrain.Instance.PlayerForEra(era) >= 0;
+        get { return GameLobbyBrain.Instance.PlayerForEra(era) == PhotonNetwork.LocalPlayer.ActorNumber; }
     }
 
     public override void Interact(PlayerManager playerManager)
@@ -36,15 +28,36 @@ public class EraSelectorEntity : Entity
 
         if (currentPlayer < 0 && playerEra < 0)
         {
-                GameLobbyBrain.Instance.photonView.RPC(
-                    "PlayerJoinOrLeaveEra", RpcTarget.MasterClient,
-                    era, player, true);
+            GameLobbyBrain.Instance.photonView.RPC(
+                "PlayerJoinOrLeaveEra", RpcTarget.MasterClient,
+                era, player, true);
         }
         else if (currentPlayer == player)
         {
-                GameLobbyBrain.Instance.photonView.RPC(
-                    "PlayerJoinOrLeaveEra", RpcTarget.MasterClient,
-                    era, player, false);
+            GameLobbyBrain.Instance.photonView.RPC(
+                "PlayerJoinOrLeaveEra", RpcTarget.MasterClient,
+                era, player, false);
+        }
+    }
+
+    public override bool CanInteract()
+    {
+        return !Used || Mine;
+    }
+
+    public override string GetDescription()
+    {
+        if (!Used)
+        {
+            return PlayerEra2.Name(era) + " Era Selector";
+        }
+        else if (Mine)
+        {
+            return PlayerEra2.Name(era) + " Era affected to you";
+        }
+        else
+        {
+            return PlayerEra2.Name(era) + " Era allready affected";
         }
     }
 }
