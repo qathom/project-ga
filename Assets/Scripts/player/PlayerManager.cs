@@ -24,8 +24,8 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
     public Camera firstPersonCamera;
     public GameObject menu;
-    public GameObject overlay;
     public PlayerInfo playerInfo;
+    public PlayerOverlay overlay;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -97,11 +97,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
                 UpdateCamera();
                 UpdateMovement();
                 UpdateCursor();
-                //UpdateOverlay();
-                if (selectedEntity != null)
-                {
-                    Debug.Log(selectedEntity.GetDescription());
-                }
+                UpdateOverlay();
 
                 if (selectedEntity != null && Input.GetKeyDown(KeyCode.E))
                 {
@@ -152,6 +148,16 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             {
                 OpenMenu();
             }
+        }
+    }
+
+    private void UpdateOverlay()
+    {
+        overlay.UpdateEra(era);
+
+        if (selectedEntity != null)
+        {
+            Debug.Log(selectedEntity.GetDescription());
         }
     }
 
