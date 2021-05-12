@@ -60,6 +60,10 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             playerName = PhotonNetwork.NickName;
             playerInfo.enabled = false;
         }
+        else
+        {
+            overlay.SetActive(false);
+        }
 
         DontDestroyOnLoad(this.gameObject);
     }
