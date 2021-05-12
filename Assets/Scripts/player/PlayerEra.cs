@@ -34,4 +34,22 @@ public class PlayerEra2
 
         return "";
     }
+
+    public static string Name(int era)
+    {
+        if (era == PAST)
+        {
+            return "PAST";
+        }
+        else if (era == PRESENT)
+        {
+            return "PRESENT";
+        }
+        else if (era == FUTURE)
+        {
+            return "FUTURE";
+        }
+
+        return "";
+    }
 }

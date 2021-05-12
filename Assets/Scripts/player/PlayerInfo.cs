@@ -10,7 +10,7 @@ public class PlayerInfo : MonoBehaviour
 
     public void UpdateInfo(string name, int era)
     {
-        nameText.text = name + (era >= 0 ? " [" + era.ToString() + "]" : "");
+        nameText.text = name + (era >= 0 ? " [" + PlayerEra2.Name(era) + "]" : "");
     }
 
     private void Update()
