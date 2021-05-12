@@ -84,6 +84,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         ChangeUI(UIIndex.CONNECTING);
 
         PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.ConnectToRegion("eu");
         PhotonNetwork.GameVersion = gameVersion;
     }
 
