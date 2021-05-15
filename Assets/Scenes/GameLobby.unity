@@ -171,8 +171,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outlineMode: 0
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineWidth: 2
+  outlineColor: {r: 1, g: 0.7058824, b: 0, a: 1}
+  outlineWidth: 10
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
@@ -1276,6 +1276,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1442858524530528261, guid: 1482f47ca954944a8a8f327b51f93775, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1442858524530528263, guid: 1482f47ca954944a8a8f327b51f93775, type: 3}
       propertyPath: m_Name
       value: Era Selector Past
@@ -1527,6 +1531,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1442858524530528261, guid: 1482f47ca954944a8a8f327b51f93775, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1442858524530528262, guid: 1482f47ca954944a8a8f327b51f93775, type: 3}
       propertyPath: era
       value: 2
@@ -1591,6 +1599,10 @@ PrefabInstance:
     - target: {fileID: 1442858524530528257, guid: 1482f47ca954944a8a8f327b51f93775, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1442858524530528261, guid: 1482f47ca954944a8a8f327b51f93775, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1442858524530528262, guid: 1482f47ca954944a8a8f327b51f93775, type: 3}
       propertyPath: era

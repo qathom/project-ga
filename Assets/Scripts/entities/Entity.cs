@@ -65,8 +65,13 @@ public class Entity : MonoBehaviour
         return true;
     }
 
+    public virtual string GetInteractionHint()
+    {
+        return "Press 'e' to interact!";
+    }
+
     public virtual string GetDescription()
     {
-        return "";
+        return "Interactable Entity";
     }
 }

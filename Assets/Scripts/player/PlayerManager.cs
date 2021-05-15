@@ -103,15 +103,31 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
                 UpdateCursor();
                 UpdateOverlay();
 
-                if (selectedEntity != null && Input.GetKeyDown(KeyCode.E))
+                // TODO: update overlay only on change?
+                // Entity selection
+                if (selectedEntity != null)
                 {
-                    if (selectedEntity.CanInteract())
+                    bool canInteract = selectedEntity.CanInteract();
+
+                    overlay.ToggleSelectionPanel(true);
+                    overlay.UpdateSelectionPanel(
+                        canInteract,
+                        selectedEntity.GetInteractionHint(),
+                        selectedEntity.GetDescription()
+                    );
+
+                    if (canInteract && Input.GetKeyDown(KeyCode.E))
                     {
                         animator.SetTrigger("Grab");
                         selectedEntity.Interact(this);
                     }
                 }
+                else
+                {
+                    overlay.ToggleSelectionPanel(false);
+                }
 
+                // Voice
                 if (Input.GetKeyDown(KeyCode.LeftShift))
                 {
                     photonRecorder.TransmitEnabled = true;
@@ -127,9 +143,9 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             {
                 era = GameLobbyBrain.Instance.EraForPlayer(PhotonNetwork.LocalPlayer.ActorNumber);
             }
-        }
 
-        playerInfo.UpdateInfo(playerName, era);
+            playerInfo.UpdateInfo(playerName, era);
+        }
     }
 
     private bool IsMine()

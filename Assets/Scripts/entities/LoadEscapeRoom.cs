@@ -19,4 +19,9 @@ public class LoadEscapeRoom : Entity
     {
         return !loadingScene && PhotonNetwork.LocalPlayer.IsMasterClient && GameLobbyBrain.Instance.IsReady;
     }
+
+    public override string GetDescription()
+    {
+        return "Start Game\nInteract when every era has been affected.";
+    }
 }
