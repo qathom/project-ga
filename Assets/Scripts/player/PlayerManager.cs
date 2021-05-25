@@ -95,14 +95,13 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         if (IsMine())
         {
             UpdateMenu();
+            UpdateCamera();
+            UpdateMovement();
+            UpdateCursor();
+            UpdateOverlay();
 
             if (!inMenu)
             {
-                UpdateCamera();
-                UpdateMovement();
-                UpdateCursor();
-                UpdateOverlay();
-
                 // TODO: update overlay only on change?
                 // Entity selection
                 if (selectedEntity != null)
@@ -139,13 +138,14 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
                 }
             }
 
+
             if (InLobby)
             {
                 era = GameLobbyBrain.Instance.EraForPlayer(PhotonNetwork.LocalPlayer.ActorNumber);
             }
-
-            playerInfo.UpdateInfo(playerName, era);
         }
+
+        playerInfo.UpdateInfo(playerName, era);
     }
 
     private bool IsMine()
@@ -183,6 +183,8 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
     private void UpdateCamera()
     {
+        if (inMenu) return;
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
@@ -203,29 +205,38 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             velocity.y = -0.5f;
         }
 
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        Vector3 move = transform.right * x + transform.forward * z;
-
-        controller.Move(move * speed * Time.deltaTime);
-
-        if (isGrounded && Input.GetButton("Jump"))
+        bool isWalking = false;
+        if (!inMenu)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            // Walking
+            float x = Input.GetAxis("Horizontal");
+            float z = Input.GetAxis("Vertical");
+
+            Vector3 move = transform.right * x + transform.forward * z;
+            controller.Move(move * speed * Time.deltaTime);
+            isWalking = move.sqrMagnitude > 0f;
+
+            //Jump
+            if (isGrounded && Input.GetButton("Jump"))
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
         }
 
+        //Gravity
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
         animator.SetBool("OnGround", isGrounded);
-        animator.SetBool("IsWalking", move.sqrMagnitude > 0f);
+        animator.SetBool("IsWalking", isWalking);
         animator.SetFloat("VerticalSpeed", velocity.magnitude);
     }
 
     private Entity selectedEntity;
     private void UpdateCursor()
     {
+        if (inMenu) return;
+
         //Debug.Log("casting ray");
         //Debug.DrawRay(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, Color.green);
 
