@@ -17,21 +17,22 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         PlayerManager.LocalInstance.transform.position = new Vector3(0, 1, 0);
-        setRoomEnv(PlayerEra2.TagForEra(PlayerManager.LocalInstance.era));
+        setRoomEnv(PlayerManager.LocalInstance.era);
     }
 
-    private void setRoomEnv(string tag)
+    private void setRoomEnv(int playerEra)
     {
         print("Setting view in epoque: " + tag);
 
-        GameObject.FindWithTag(tag).SetActive(true);
-
         foreach (int era in PlayerEra2.Values)
         {
-            string otherTag = PlayerEra2.TagForEra(era);
-            if (!otherTag.Equals(tag))
+            bool active = playerEra == era;
+            GameObject[] gameObjects = GameObject
+                .FindGameObjectsWithTag(PlayerEra2.TagForEra(era));
+
+            foreach (GameObject gameObject in gameObjects)
             {
-                GameObject.FindWithTag(otherTag).SetActive(false);
+                gameObject.SetActive(active);
             }
         }
     }

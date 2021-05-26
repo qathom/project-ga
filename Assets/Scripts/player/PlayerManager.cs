@@ -12,6 +12,9 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     [HideInInspector]
     public string playerName;
 
+    [SerializeField]
+    private Transform hand;
+
     public Animator animator;
     public CharacterController controller;
     public SkinnedMeshRenderer avatar;
@@ -102,30 +105,6 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
             if (!inMenu)
             {
-                // TODO: update overlay only on change?
-                // Entity selection
-                if (selectedEntity != null)
-                {
-                    bool canInteract = selectedEntity.CanInteract();
-
-                    overlay.ToggleSelectionPanel(true);
-                    overlay.UpdateSelectionPanel(
-                        canInteract,
-                        selectedEntity.GetInteractionHint(),
-                        selectedEntity.GetDescription()
-                    );
-
-                    if (canInteract && Input.GetKeyDown(KeyCode.E))
-                    {
-                        animator.SetTrigger("Grab");
-                        selectedEntity.Interact(this);
-                    }
-                }
-                else
-                {
-                    overlay.ToggleSelectionPanel(false);
-                }
-
                 // Voice
                 if (Input.GetKeyDown(KeyCode.LeftShift))
                 {
@@ -175,9 +154,29 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     {
         overlay.UpdateEra(era);
 
-        if (selectedEntity != null)
+        if (!inMenu)
         {
-            Debug.Log(selectedEntity.GetDescription());
+            if (selectedEntity != null)
+            {
+                bool canInteract = selectedEntity.CanInteract(this);
+
+                overlay.ToggleSelectionPanel(true);
+                overlay.UpdateSelectionPanel(
+                    canInteract,
+                    selectedEntity.GetInteractionHint(this),
+                    selectedEntity.GetDescription(this)
+                );
+
+                if (canInteract && Input.GetKeyDown(KeyCode.E))
+                {
+                    animator.SetTrigger("Grab");
+                    selectedEntity.Interact(this);
+                }
+            }
+            else
+            {
+                overlay.ToggleSelectionPanel(false);
+            }
         }
     }
 
@@ -232,6 +231,8 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         animator.SetFloat("VerticalSpeed", velocity.magnitude);
     }
 
+    public Entity Entity;
+    public bool CanPickUpEntity { get { return Entity == null; } }
     private Entity selectedEntity;
     private void UpdateCursor()
     {
@@ -263,6 +264,17 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             selectedEntity.Highlighted = false;
             selectedEntity = null;
         }
+    }
+
+    public void PickUpEntity(Entity entity)
+    {
+        Entity = entity;
+        entity.AttachTo(hand);
+    }
+
+    public void DropEntity()
+    {
+        Entity = null;
     }
 
     public void LeaveRoom()

@@ -15,12 +15,12 @@ public class LoadEscapeRoom : Entity
         PhotonNetwork.LoadLevel(sceneId);
     }
 
-    public override bool CanInteract()
+    public override bool CanInteract(PlayerManager playerManager)
     {
         return !loadingScene && PhotonNetwork.LocalPlayer.IsMasterClient && GameLobbyBrain.Instance.IsReady;
     }
 
-    public override string GetDescription()
+    public override string GetDescription(PlayerManager playerManager)
     {
         return "Start Game\nInteract when every era has been affected.";
     }
