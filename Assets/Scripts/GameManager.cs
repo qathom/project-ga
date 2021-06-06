@@ -3,11 +3,18 @@ using UnityEngine.SceneManagement;
 
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
+
+    [SerializeField]
+    private int playerCount = 3;
+    private int escapedPlayerCount = 0;
+
+    private bool gameEnded = false;
 
     private void Awake()
     {
@@ -18,6 +25,23 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         PlayerManager.LocalInstance.transform.position = new Vector3(0, 1, 0);
         setRoomEnv(PlayerManager.LocalInstance.era);
+    }
+
+    private void Update()
+    {
+        if (!gameEnded)
+        {
+            if (escapedPlayerCount >= playerCount)
+            {
+                // TODO: load end game scene
+                gameEnded = true;
+            }
+        }
+
+        if (gameEnded)
+        {
+            print("GAME ENDED");
+        }
     }
 
     private void setRoomEnv(int playerEra)
@@ -47,4 +71,36 @@ public class GameManager : MonoBehaviourPunCallbacks
         Debug.Log("Sombody left. Also leaving.");
         PhotonNetwork.LeaveRoom();
     }
+
+
+    public void sendPlayerEscapedMessage()
+    {
+        photonView.RPC("PlayerEscaped", RpcTarget.MasterClient);
+    }
+
+    #region Pun RPCs
+
+    [PunRPC]
+    public void PlayerEscaped()
+    {
+        escapedPlayerCount += 1;
+    }
+
+    #endregion
+
+    #region Pun Observable
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(gameEnded);
+        }
+        else
+        {
+            gameEnded = (bool)stream.ReceiveNext();
+        }
+    }
+
+    #endregion
 }

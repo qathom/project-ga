@@ -42,7 +42,6 @@ public class Entity : MonoBehaviour
 
         // Setup outline
         outline = GetComponent<Outline>();
-        Debug.Log(outline);
         Highlighted = highlighted;
     }
 

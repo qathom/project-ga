@@ -29,6 +29,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     public GameObject menu;
     public PlayerInfo playerInfo;
     public PlayerOverlay overlay;
+    public PlayerInputOverlay inputOverlay;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -55,19 +56,24 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             ? UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly
             : UnityEngine.Rendering.ShadowCastingMode.On;
 
-        // Tag local player instance to not destroy when loadong various scenes.
         if (mine)
         {
+            print("mine");
             PlayerManager.LocalInstance = this;
             Cursor.lockState = CursorLockMode.Locked;
             playerName = PhotonNetwork.NickName;
             playerInfo.enabled = false;
+            CloseMenu();
         }
         else
         {
+            print("not mine");
+            menu.SetActive(false);
             overlay.SetActive(false);
+            inputOverlay.SetActive(false);
         }
 
+        // Tag local player instance to not destroy when loadong various scenes.
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -234,6 +240,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     public Entity Entity;
     public bool CanPickUpEntity { get { return Entity == null; } }
     private Entity selectedEntity;
+    public Entity SelectedEntity { get { return selectedEntity; } }
     private void UpdateCursor()
     {
         if (inMenu) return;
@@ -287,6 +294,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         inMenu = true;
         menu.SetActive(true);
         overlay.SetActive(false);
+        inputOverlay.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
     }
 
@@ -295,7 +303,22 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         inMenu = false;
         menu.SetActive(false);
         overlay.SetActive(true);
+        inputOverlay.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    public void OpenInputOverlay()
+    {
+        inMenu = true;
+        menu.SetActive(false);
+        overlay.SetActive(false);
+        inputOverlay.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public void SendInput()
+    {
+        inputOverlay.SendInput();
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
