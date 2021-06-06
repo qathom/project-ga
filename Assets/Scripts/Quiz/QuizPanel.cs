@@ -49,26 +49,26 @@ public class QuizPanel : MonoBehaviourPun
         // Profiles
         string[] LEADER = {"1.2", "2.1", "3.1"};
         string[] SHY = {"1.2", "2.2", "3.3"};
-        string[] INVISIBLE = {"1.2", "2.2", "3.2"};
+        string[] INVISIBLE = {"1.3", "2.2", "3.2"};
 
         var profileRes = new Dictionary<string, int>();
 
+        // Init
+        profileRes["LEADER"] = 0;
+        profileRes["SHY"] = 0;
+        profileRes["INVISIBLE"] = 0;
+
         foreach (string res in results) {
-            Debug.Log(res);
             if (LEADER.Contains(res)) {
-                profileRes["LEADER"] = 1;
+                profileRes["LEADER"] += 1;
             } else if (SHY.Contains(res)) {
-                profileRes["SHY"] = 1;
+                profileRes["SHY"] += 1;
             } else if (INVISIBLE.Contains(res)) {
-                profileRes["LEADER"] = 1;
+                profileRes["INVISIBLE"] += 1;
             }
         }
 
-        Debug.Log(profileRes);
-
         var max = profileRes.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-
-        Debug.Log(max);
 
         resultText.text = max;
     }
