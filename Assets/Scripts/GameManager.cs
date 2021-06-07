@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void setRoomEnv(int playerEra)
     {
-        print("Setting view in epoque: " + tag);
+        //print("Setting view in epoque: " + tag);
 
         foreach (int era in PlayerEra2.Values)
         {

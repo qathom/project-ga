@@ -9,11 +9,13 @@ public class GameStatistics : MonoBehaviour
     public static bool IsReady { get { return _instance != null; } }
 
     private Dictionary<string, PlayerStatistics> playerStatistics;
+    public Dictionary<string, PlayerStatistics> AllPlayerStatistics { get { return playerStatistics; } }
 
     public class PlayerStatistics
     {
         public string name;
         public float talkDuration = 0f;
+        public int Score { get { return (int)(talkDuration * 100f); } }
 
         public PlayerStatistics(string name)
         {
@@ -29,17 +31,15 @@ public class GameStatistics : MonoBehaviour
 
     public void UpdateTalkDuration(string name, float talkDuration)
     {
-        getPlayerStatisctics(name).talkDuration = talkDuration;
+        GetPlayerStatisctics(name).talkDuration = talkDuration;
     }
 
-    public PlayerStatistics getPlayerStatisctics(string name)
+    public PlayerStatistics GetPlayerStatisctics(string name)
     {
         if (!playerStatistics.ContainsKey(name))
         {
             playerStatistics.Add(name, new PlayerStatistics(name));
         }
-
-        print(playerStatistics[name]);
 
         return playerStatistics[name];
     }

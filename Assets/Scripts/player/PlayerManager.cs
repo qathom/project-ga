@@ -61,7 +61,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
         if (mine)
         {
-            print("mine");
+            //print("mine");
             PlayerManager.LocalInstance = this;
             Cursor.lockState = CursorLockMode.Locked;
             playerName = PhotonNetwork.NickName;
@@ -70,7 +70,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         }
         else
         {
-            print("not mine");
+            //print("not mine");
             menu.SetActive(false);
             overlay.SetActive(false);
             inputOverlay.SetActive(false);
