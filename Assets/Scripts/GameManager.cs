@@ -41,7 +41,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (gameEnded)
         {
             print("GAME ENDED");
-        }
+
+            // TODO: save local data & load quizz scene
+        }  
     }
 
     private void setRoomEnv(int playerEra)

@@ -15,6 +15,9 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     [SerializeField]
     private Transform hand;
 
+    private float talkDuration = 0.0f;
+    private bool talking = false;
+
     public Animator animator;
     public CharacterController controller;
     public SkinnedMeshRenderer avatar;
@@ -109,20 +112,23 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             UpdateCursor();
             UpdateOverlay();
 
-            if (!inMenu)
+            // Voice
+            if (talking)
             {
-                // Voice
-                if (Input.GetKeyDown(KeyCode.LeftShift))
-                {
-                    photonRecorder.TransmitEnabled = true;
-                }
-
-                if (Input.GetKeyUp(KeyCode.LeftShift))
-                {
-                    photonRecorder.TransmitEnabled = false;
-                }
+                talkDuration += Time.deltaTime;
             }
 
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                photonRecorder.TransmitEnabled = true;
+                talking = true;
+            }
+
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                photonRecorder.TransmitEnabled = false;
+                talking = false;
+            }
 
             if (InLobby)
             {
@@ -328,12 +334,23 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             stream.SendNext(playerName);
 
             stream.SendNext(era);
+
+            stream.SendNext(talking);
+
+            stream.SendNext(talkDuration);
         }
         else
         {
             this.playerName = (string)stream.ReceiveNext();
 
             this.era = (int)stream.ReceiveNext();
+
+            this.talking = (bool)stream.ReceiveNext();
+
+            this.talkDuration = (float)stream.ReceiveNext();
         }
+
+        //TODO
+        //GameManager.Instance.updatePlayerInfo(playerName, talkDuration);
     }
 }
