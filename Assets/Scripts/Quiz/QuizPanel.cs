@@ -20,9 +20,10 @@ public class QuizPanel : MonoBehaviourPun
         Debug.Log("SETUP");
 
         LocalInstance = this;
+        Cursor.lockState = CursorLockMode.None;
 
-		// Setup visibility
-		SetVisibility("Panel 1", true);
+        // Setup visibility
+        SetVisibility("Panel 1", true);
 		SetVisibility("Panel 2", false);
 		SetVisibility("Panel 3", false);
 		SetVisibility("PanelRes", false);

@@ -15,35 +15,43 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private int escapedPlayerCount = 0;
 
     private bool gameEnded = false;
+    private float leaveCooldown = 5f;
+
+    public bool HasGameEnded { get { return gameEnded; } }
+    public float LeaveCooldown { get { return leaveCooldown; } }
 
     private void Awake()
     {
         _instance = this;
+        PhotonNetwork.AutomaticallySyncScene = false;
+        PhotonNetwork.CurrentRoom.IsOpen = false;
     }
 
     private void Start()
     {
-        PlayerManager.LocalInstance.transform.position = new Vector3(0, 1, 0);
         setRoomEnv(PlayerManager.LocalInstance.era);
+        PlayerManager.LocalInstance.transform.position = new Vector3(0, 1, 0);
     }
 
     private void Update()
     {
-        if (!gameEnded)
+        if (PhotonNetwork.IsMasterClient)
         {
-            if (escapedPlayerCount >= playerCount)
+            if (!gameEnded && escapedPlayerCount >= playerCount)
             {
-                // TODO: load end game scene
+                // Game Ended
                 gameEnded = true;
             }
+
+            if (gameEnded)
+            {
+                leaveCooldown -= Time.deltaTime;
+                if (leaveCooldown <= 0f)
+                {
+                    photonView.RPC("GameEnded", RpcTarget.AllBufferedViaServer);
+                }
+            }
         }
-
-        if (gameEnded)
-        {
-            print("GAME ENDED");
-
-            // TODO: save local data & load quizz scene
-        }  
     }
 
     private void setRoomEnv(int playerEra)
@@ -65,13 +73,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     public override void OnLeftRoom()
     {
-        SceneManager.LoadScene(0);
+        if (!gameEnded){
+            SceneManager.LoadScene(0);
+        }
     }
 
     public override void OnPlayerLeftRoom(Player other)
     {
-        Debug.Log("Sombody left. Also leaving.");
-        PhotonNetwork.LeaveRoom();
+        if (!gameEnded)
+        {
+            Debug.Log("Sombody left. Also leaving.");
+            PhotonNetwork.LeaveRoom();
+        }
     }
 
 
@@ -88,6 +101,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         escapedPlayerCount += 1;
     }
 
+    [PunRPC]
+    public void GameEnded()
+    {
+        PhotonNetwork.LeaveRoom();
+        DontDestroyOnLoad(GameStatistics.Instance);
+        Cursor.lockState = CursorLockMode.None;
+        SceneManager.LoadScene(4);
+    }
+
     #endregion
 
     #region Pun Observable
@@ -96,11 +118,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (stream.IsWriting)
         {
+            stream.SendNext(escapedPlayerCount);
             stream.SendNext(gameEnded);
+            stream.SendNext(leaveCooldown);
         }
         else
         {
+            escapedPlayerCount = (int)stream.ReceiveNext();
             gameEnded = (bool)stream.ReceiveNext();
+            leaveCooldown = (float)stream.ReceiveNext();
         }
     }
 

@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Two Player Test Room.unity
     guid: be2c0743bd24743a3a103607d72d34e0
+  - enabled: 1
+    path: Assets/Scenes/quiz/QuizScene.unity
+    guid: f39b18ce5f987b543915a1cae5c52e3f
   m_configObjects: {}

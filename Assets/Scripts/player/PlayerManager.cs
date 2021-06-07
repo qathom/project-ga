@@ -164,6 +164,18 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
     private void UpdateOverlay()
     {
+        if (InEscapeRoom)
+        {
+            bool gameEnded = GameManager.Instance.HasGameEnded;
+
+            if (inMenu && gameEnded)
+            {
+                CloseMenu();
+            }
+
+            overlay.UpdateGameEnded(gameEnded, GameManager.Instance.LeaveCooldown);
+        }
+
         overlay.UpdateEra(era);
 
         if (!inMenu)
@@ -350,7 +362,9 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             this.talkDuration = (float)stream.ReceiveNext();
         }
 
-        //TODO
-        //GameManager.Instance.updatePlayerInfo(playerName, talkDuration);
+        if (InEscapeRoom && GameStatistics.IsReady)
+        {
+            GameStatistics.Instance.UpdateTalkDuration(playerName, talkDuration);
+        }
     }
 }
