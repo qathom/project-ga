@@ -5,9 +5,7 @@ using UnityEngine;
 public class RunAway : MonoBehaviour
 {
     private UnityEngine.AI.NavMeshAgent agent;
-
-    // TODO
-    bool IsRunAway = true;
+    public bool IsRunAway = true;
 
     Animator anim;
     Rigidbody rb;
@@ -50,7 +48,8 @@ public class RunAway : MonoBehaviour
 
             Vector3 pos = Vector3.MoveTowards(transform.position, player.position, speed * Time.fixedDeltaTime);
             rb.MovePosition(pos);
-            transform.LookAt(player);
+            transform.LookAt(player, Vector3.up);
+            transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 
             agent.SetDestination(pos);
         } else {

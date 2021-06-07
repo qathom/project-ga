@@ -269,7 +269,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         RaycastHit hit;
         Ray ray = new Ray(firstPersonCamera.transform.position, firstPersonCamera.transform.forward);
 
-        if (Physics.Raycast(ray, out hit, cursorReach, LayerMask.GetMask("Entities")))
+        if (Physics.Raycast(ray, out hit, cursorReach, LayerMask.GetMask("Default", "Entities")))
         {
             Entity entity = hit.transform.GetComponent<Entity>();
 
