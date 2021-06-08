@@ -14,6 +14,9 @@ public class RunAway : MonoBehaviour
     float minDistance = 3f;
     private float canJump = 0f;
     public float timeBeforeNextJump = 5f;
+    public float maxDistanceToStop = 10;
+    private Vector3 initialPosition;
+    private Vector3 latestPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +24,8 @@ public class RunAway : MonoBehaviour
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        initialPosition = transform.position;
+        latestPosition = initialPosition;
     }
 
     private void Update()
@@ -64,10 +69,22 @@ public class RunAway : MonoBehaviour
         Vector3 playerPosition = PlayerManager.LocalInstance.firstPersonCamera.transform.position;
         float distance = Vector3.Distance(transform.position, playerPosition);
 
-        if (distance > 20) {
-            Debug.Log("STOP");
-
+        if (latestPosition != transform.position) {
+            anim.SetInteger("Walk", 1);
+        } else {
             anim.SetInteger("Walk", 0);
+        }
+
+        // Update latest position
+        latestPosition = transform.position;
+
+        if (distance > maxDistanceToStop) {
+            Debug.Log("BACK TO INITIAL POSITION");
+
+            // anim.SetInteger("Walk", 0);
+
+            agent.SetDestination(initialPosition);
+
             return;
         }
 
@@ -83,7 +100,7 @@ public class RunAway : MonoBehaviour
 
         Debug.Log("RUN");
 
-        anim.SetInteger("Walk", 1);
+        // anim.SetInteger("Walk", 1);
 
         Vector3 dirToPlayer = transform.position - playerPosition;
         Vector3 newPos = transform.position + dirToPlayer;
