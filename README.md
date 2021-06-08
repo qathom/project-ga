@@ -1,8 +1,10 @@
-# project-ga
+# [project-ga](https://github.com/qathom/project-ga)
 
 ## Installation
 
-TODO
+* Download the zip file from the Github repository or run `git clone https://github.com/qathom/project-ga`
+* Open the project with Unity
+* Start the scene named "Launcher" located in `Assets/Scenes/Launcher.unity` 
 
 ## Documentation
 
