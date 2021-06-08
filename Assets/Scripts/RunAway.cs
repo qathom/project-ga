@@ -79,7 +79,7 @@ public class RunAway : MonoBehaviour
         latestPosition = transform.position;
 
         if (distance > maxDistanceToStop) {
-            Debug.Log("BACK TO INITIAL POSITION");
+            //Debug.Log("BACK TO INITIAL POSITION");
 
             // anim.SetInteger("Walk", 0);
 
@@ -89,7 +89,7 @@ public class RunAway : MonoBehaviour
         }
 
         if (distance < 5) {
-            Debug.Log("JUMP");
+            //Debug.Log("JUMP");
             Jump();
             return;
         }
@@ -98,7 +98,7 @@ public class RunAway : MonoBehaviour
         // Restore collision
         rb.isKinematic = false;
 
-        Debug.Log("RUN");
+        //Debug.Log("RUN");
 
         // anim.SetInteger("Walk", 1);
 

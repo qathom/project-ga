@@ -291,6 +291,13 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         }
     }
 
+    public void Teleport()
+    {
+        controller.enabled = false;
+        transform.position = new Vector3(0, 1, 0);
+        controller.enabled = true;
+    }
+
     public void PickUpEntity(Entity entity)
     {
         Entity = entity;
@@ -365,6 +372,15 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         if (InEscapeRoom && GameStatistics.IsReady)
         {
             GameStatistics.Instance.UpdateTalkDuration(playerName, talkDuration);
+        }
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        PushBehavior behavior = hit.rigidbody.GetComponent<PushBehavior>();
+        if (behavior != null)
+        {
+            behavior.Push((hit.transform.position - transform.position).normalized, hit.rigidbody);
         }
     }
 }

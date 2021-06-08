@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     private void Start()
     {
         setRoomEnv(PlayerManager.LocalInstance.era);
-        PlayerManager.LocalInstance.transform.position = new Vector3(0, 1, 0);
+        PlayerManager.LocalInstance.Teleport();
     }
 
     private void Update()
