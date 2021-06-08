@@ -12,7 +12,7 @@ public class GameLobbyBrain : MonoBehaviourPunCallbacks, IPunObservable
     private GameObject playerPrefab;
 
     [SerializeField]
-    private int playerCount = 3;
+    private int playerCount = 1;
 
     private static GameLobbyBrain _instance;
     public static GameLobbyBrain Instance { get { return _instance; } }

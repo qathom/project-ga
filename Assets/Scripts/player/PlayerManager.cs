@@ -12,6 +12,12 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     [HideInInspector]
     public string playerName;
 
+    [SerializeField]
+    private Transform hand;
+
+    private float talkDuration = 0.0f;
+    private bool talking = false;
+
     public Animator animator;
     public CharacterController controller;
     public SkinnedMeshRenderer avatar;
@@ -26,6 +32,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
     public GameObject menu;
     public PlayerInfo playerInfo;
     public PlayerOverlay overlay;
+    public PlayerInputOverlay inputOverlay;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -52,19 +59,24 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             ? UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly
             : UnityEngine.Rendering.ShadowCastingMode.On;
 
-        // Tag local player instance to not destroy when loadong various scenes.
         if (mine)
         {
+            //print("mine");
             PlayerManager.LocalInstance = this;
             Cursor.lockState = CursorLockMode.Locked;
             playerName = PhotonNetwork.NickName;
             playerInfo.enabled = false;
+            CloseMenu();
         }
         else
         {
+            //print("not mine");
+            menu.SetActive(false);
             overlay.SetActive(false);
+            inputOverlay.SetActive(false);
         }
 
+        // Tag local player instance to not destroy when loadong various scenes.
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -100,44 +112,23 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             UpdateCursor();
             UpdateOverlay();
 
-            if (!inMenu)
+            // Voice
+            if (talking)
             {
-                // TODO: update overlay only on change?
-                // Entity selection
-                if (selectedEntity != null)
-                {
-                    bool canInteract = selectedEntity.CanInteract();
-
-                    overlay.ToggleSelectionPanel(true);
-                    overlay.UpdateSelectionPanel(
-                        canInteract,
-                        selectedEntity.GetInteractionHint(),
-                        selectedEntity.GetDescription()
-                    );
-
-                    if (canInteract && Input.GetKeyDown(KeyCode.E))
-                    {
-                        animator.SetTrigger("Grab");
-                        selectedEntity.Interact(this);
-                    }
-                }
-                else
-                {
-                    overlay.ToggleSelectionPanel(false);
-                }
-
-                // Voice
-                if (Input.GetKeyDown(KeyCode.LeftShift))
-                {
-                    photonRecorder.TransmitEnabled = true;
-                }
-
-                if (Input.GetKeyUp(KeyCode.LeftShift))
-                {
-                    photonRecorder.TransmitEnabled = false;
-                }
+                talkDuration += Time.deltaTime;
             }
 
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                photonRecorder.TransmitEnabled = true;
+                talking = true;
+            }
+
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                photonRecorder.TransmitEnabled = false;
+                talking = false;
+            }
 
             if (InLobby)
             {
@@ -173,11 +164,43 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
 
     private void UpdateOverlay()
     {
+        if (InEscapeRoom)
+        {
+            bool gameEnded = GameManager.Instance.HasGameEnded;
+
+            if (inMenu && gameEnded)
+            {
+                CloseMenu();
+            }
+
+            overlay.UpdateGameEnded(gameEnded, GameManager.Instance.LeaveCooldown);
+        }
+
         overlay.UpdateEra(era);
 
-        if (selectedEntity != null)
+        if (!inMenu)
         {
-            Debug.Log(selectedEntity.GetDescription());
+            if (selectedEntity != null)
+            {
+                bool canInteract = selectedEntity.CanInteract(this);
+
+                overlay.ToggleSelectionPanel(true);
+                overlay.UpdateSelectionPanel(
+                    canInteract,
+                    selectedEntity.GetInteractionHint(this),
+                    selectedEntity.GetDescription(this)
+                );
+
+                if (canInteract && Input.GetKeyDown(KeyCode.E))
+                {
+                    animator.SetTrigger("Grab");
+                    selectedEntity.Interact(this);
+                }
+            }
+            else
+            {
+                overlay.ToggleSelectionPanel(false);
+            }
         }
     }
 
@@ -232,7 +255,10 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         animator.SetFloat("VerticalSpeed", velocity.magnitude);
     }
 
+    public Entity Entity;
+    public bool CanPickUpEntity { get { return Entity == null; } }
     private Entity selectedEntity;
+    public Entity SelectedEntity { get { return selectedEntity; } }
     private void UpdateCursor()
     {
         if (inMenu) return;
@@ -243,7 +269,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         RaycastHit hit;
         Ray ray = new Ray(firstPersonCamera.transform.position, firstPersonCamera.transform.forward);
 
-        if (Physics.Raycast(ray, out hit, cursorReach, LayerMask.GetMask("Entities")))
+        if (Physics.Raycast(ray, out hit, cursorReach, LayerMask.GetMask("Default", "Entities")))
         {
             Entity entity = hit.transform.GetComponent<Entity>();
 
@@ -265,6 +291,24 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         }
     }
 
+    public void Teleport()
+    {
+        controller.enabled = false;
+        transform.position = new Vector3(0, 1, 0);
+        controller.enabled = true;
+    }
+
+    public void PickUpEntity(Entity entity)
+    {
+        Entity = entity;
+        entity.AttachTo(hand);
+    }
+
+    public void DropEntity()
+    {
+        Entity = null;
+    }
+
     public void LeaveRoom()
     {
         PhotonNetwork.LeaveRoom();
@@ -275,6 +319,7 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         inMenu = true;
         menu.SetActive(true);
         overlay.SetActive(false);
+        inputOverlay.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
     }
 
@@ -283,7 +328,22 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
         inMenu = false;
         menu.SetActive(false);
         overlay.SetActive(true);
+        inputOverlay.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    public void OpenInputOverlay()
+    {
+        inMenu = true;
+        menu.SetActive(false);
+        overlay.SetActive(false);
+        inputOverlay.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public void SendInput()
+    {
+        inputOverlay.SendInput();
     }
 
     void IPunObservable.OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -293,12 +353,34 @@ public class PlayerManager : MonoBehaviourPun, IPunObservable
             stream.SendNext(playerName);
 
             stream.SendNext(era);
+
+            stream.SendNext(talking);
+
+            stream.SendNext(talkDuration);
         }
         else
         {
             this.playerName = (string)stream.ReceiveNext();
 
             this.era = (int)stream.ReceiveNext();
+
+            this.talking = (bool)stream.ReceiveNext();
+
+            this.talkDuration = (float)stream.ReceiveNext();
+        }
+
+        if (InEscapeRoom && GameStatistics.IsReady)
+        {
+            GameStatistics.Instance.UpdateTalkDuration(playerName, talkDuration);
+        }
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        PushBehavior behavior = hit.rigidbody.GetComponent<PushBehavior>();
+        if (behavior != null)
+        {
+            behavior.Push((hit.transform.position - transform.position).normalized, hit.rigidbody);
         }
     }
 }

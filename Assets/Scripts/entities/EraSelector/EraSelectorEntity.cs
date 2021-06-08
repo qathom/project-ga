@@ -40,12 +40,12 @@ public class EraSelectorEntity : Entity
         }
     }
 
-    public override bool CanInteract()
+    public override bool CanInteract(PlayerManager playerManager)
     {
         return !Used || Mine;
     }
 
-    public override string GetDescription()
+    public override string GetDescription(PlayerManager playerManager)
     {
         if (!Used)
         {

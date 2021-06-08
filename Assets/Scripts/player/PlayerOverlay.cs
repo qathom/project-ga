@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,17 @@ public class PlayerOverlay : MonoBehaviour
 
     [SerializeField]
     private Text interactHintText;
+
+    [SerializeField]
+    private GameObject gameEndedPanel;
+
+    [SerializeField]
+    private Text leaveCooldownText;
+
+    private void Start()
+    {
+        gameEndedPanel.SetActive(false);
+    }
 
     public void UpdateEra(int era)
     {
@@ -39,5 +51,15 @@ public class PlayerOverlay : MonoBehaviour
     public void SetActive(bool active)
     {
         gameObject.SetActive(active);
+    }
+
+    internal void UpdateGameEnded(bool hasGameEnded, float leaveCooldown)
+    {
+        gameEndedPanel.SetActive(hasGameEnded);
+        if (hasGameEnded)
+        {
+            int cooldown = (int) Math.Ceiling(leaveCooldown);
+            leaveCooldownText.text = "Leaving in " + cooldown.ToString() + " seconds.";
+        }
     }
 }

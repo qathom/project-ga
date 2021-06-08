@@ -42,7 +42,6 @@ public class Entity : MonoBehaviour
 
         // Setup outline
         outline = GetComponent<Outline>();
-        Debug.Log(outline);
         Highlighted = highlighted;
     }
 
@@ -58,19 +57,30 @@ public class Entity : MonoBehaviour
 
     public virtual void Interact(PlayerManager playerManager)
     {
+        
     }
 
-    public virtual bool CanInteract()
+    public virtual void AttachTo(Transform parent)
+    {
+        transform.SetParent(parent);
+    }
+
+    public virtual bool CanInteract(PlayerManager playerManager)
     {
         return true;
     }
 
-    public virtual string GetInteractionHint()
+    public virtual bool CanPickUp(PlayerManager playerManager)
+    {
+        return false;
+    }
+
+    public virtual string GetInteractionHint(PlayerManager playerManager)
     {
         return "Press 'e' to interact!";
     }
 
-    public virtual string GetDescription()
+    public virtual string GetDescription(PlayerManager playerManager)
     {
         return "Interactable Entity";
     }
