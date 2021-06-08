@@ -13,6 +13,7 @@ public class TreasureChestEntity : ContainerEntity
         base.Interact(playerManager);
         openedChest.SetActive(false);
         closedChest.SetActive(true);
+        entity.gameObject.SetActive(false);
     }
 
     public override bool CanContainPlayerEntity(PlayerManager playerManager)

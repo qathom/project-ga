@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ContainerEntity : Entity
 {
-    [HideInInspector]
     public Entity entity = null;
     public bool HasEntity { get { return entity != null; } }
 
@@ -15,7 +14,7 @@ public class ContainerEntity : Entity
     {
         entity = playerManager.Entity;
         playerManager.DropEntity();
-        entity.AttachTo(null);
+        entity.AttachTo(container);
         updateEntityPosition();
     }
 
