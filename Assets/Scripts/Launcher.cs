@@ -62,7 +62,9 @@ public class Launcher : MonoBehaviourPunCallbacks
     private RoomList roomList;
 
     private string gameVersion = "1";
-    private byte maxPlayersPerRoom = 3;
+
+    [SerializeField]
+    private byte maxPlayersPerRoom = 2;
 
     private void Awake()
     {
